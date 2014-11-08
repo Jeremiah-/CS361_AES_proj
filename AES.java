@@ -8,7 +8,7 @@ public class AES{
 			return;
 
 		} else if (args.length > 3) {
-			System.out.println("Too many arguments. Form should be: java AES e/d keyFile plainTextFile")
+			System.out.println("Too many arguments. Form should be: java AES e/d keyFile plainTextFile");
 			return;
 		}
 
@@ -24,10 +24,17 @@ public class AES{
 
 		// TODO: is this what they want? Make sure if they want output.
 		if (keyFile.length() < 32) {
-			System.out.println("Key size too small. Needs to be 128 bits in hex format.");
+			System.out.println("Key size too small. Needs to be 32 hex characters  (128 bits) in hex format.");
 			return;
 		}
+
+
 		KeyFunctions key = new KeyFunctions(keyFile);
+
+		if (key.isInvalid()) {
+			// System.out.println("Error: Key has non hex characters.");
+			return;
+		}
 
 
 	}

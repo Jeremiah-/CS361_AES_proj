@@ -1,39 +1,102 @@
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.Scanner;
+import java.lang.Integer;
 
 public class KeyFunctions {
 	// for this program, we are assuming the key is a 4x4 array
 	private int[][] key;
 
 	public KeyFunctions (File keyFile) {
-		
-		this.key = readFile(keyFile);
+		try {
+			this.key = readFile(keyFile);
+		} catch (Exception e) {
+			
+		}
 	}
 
-	private int[][] readFile (File keyFile) {
-		int[][] newKey = new int[4][4];
+	private int[][] readFile (File keyFile) throws Exception{
 
-		FileInputStream fileScanner = new FileInputStream(keyFile);
+		// http://en.wikipedia.org/wiki/Rijndael_key_schedule#Constants
+		// says the num of rows is 16 for 128 bit key
+		int[][] newKey = new int[4][16];
 
-		for (int y = 0; y < 4; y++) {
-			for (int x = 0; x < 4; x++) {
-				if (fileScanner.available < 1) {
-					break;
+		Scanner fileScanner;
+
+		try {
+			fileScanner = new Scanner(keyFile);
+		} catch (Exception e) {
+			// the file is checked before this point, so this should never execute.
+			System.out.println("FileInputStream threw an error inside readFile().");
+			return null;
+		}
+
+		String hexLine = fileScanner.nextLine();
+
+		if (hexLine.length() < 32) {
+			System.out.println("Error: Key is too small.")
+			return null;
+		}
+		int begin = 0;
+		int end = 2;
+
+		// TODO: take the line, read two chars at a time (string of size 2)
+		// use Integer.decode(string)
+		// if it throws an error, it's a bad line since it's not hex
+		outerLoop:
+		for (int row = 0; row < 4; row++) {
+			for (int col = 0; col < 4; col++) {
+				// int val = 0;
+				String hexVal = hexLine.substring(begin, end);
+				int val; 
+				try {
+					val = Integer.decode(hexVal);
+				} catch (Exception e) {
+					System.out.println("Error: Key has non hex characters.");
+					return null;
 				}
-				char val = (char) fileScanner.read();
+				
 
-				if (val >= '0' && val <= '9') {
+				// int firstHalf = 0;
+				// int secondHalf = 0;
 
-				} else if (val >= 'A' && val <= 'F') {
+				// if (fileScanner.available() > 1) {
+				// 	firstHalf = fileScanner.read();
+				// 	secondHalf = fileScanner.read();
+				// 	break;
+				// } else if (fileScanner.available() == 1) {
+				// 	firstHalf = fileScanner.read();
+				// } else {
+				// 	break outerLoop;
+				// }
 
-				} else if (val >= 'a' && val <= 'f') {
+				// if (firstHalf >= '0' && firstHalf <= '9' && secondHalf >= '0' && secondHalf <= '9') {
 
-				} else {
-					// TODO: what should happen here?
+				// } else if (firstHalf >= 'A' && firstHalf <= 'F' && secondHalf >= 'A' && secondHalf <= 'F') {
 
-				}
+				// } else if (firstHalf >= 'a' && firstHalf <= 'f' && secondHalf >= 'a' && secondHalf <= 'f') {
+
+				// } else {
+				// 	// this means there is a non-hex character
+				// 	return null;
+				// }
+
+				// val = (firstHalf << 4) | secondHalf;
+				this.key[row, col] = val;
+				begin += 2;
+				end += 2;
 			}
 		}
 
 		return newKey;
+	}
+
+	// TODO: need to test this
+	public boolean isInvalid() {
+		if (this.key == null) {
+			return true;
+		}
+
+		return false;
 	}
 }
