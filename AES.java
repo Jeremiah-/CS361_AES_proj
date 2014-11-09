@@ -35,7 +35,9 @@ public class AES{
 			System.out.println("Error: Key has non hex characters.");
 			return;
 		}
-		
 
+		
+		
+		// initialize the round key
 	}
 }
