@@ -41,7 +41,9 @@ public class KeyFunctions {
 
 		// now begins the key transformation
 		SBox.subBytes(newKey);
-		addColumns(newKey);
+
+		// the name is misleading but all we're doing is adding the old and new matrices
+		addRoundKey(newKey); 
 
 		this.key = newKey;
 
@@ -49,14 +51,13 @@ public class KeyFunctions {
 		this.round++;
 	}
 
-	private void addColumns(byte[][] nk) {
+	public void addRoundKey(byte[][] matrix) {
 		for (int row = 0; row < 4; row++) {
 			for (int col = 0; col < 4; col++) {
-				nk[row][col] = (byte) ((nk[row][col]) ^ (this.key[row][col]));
+				matrix[row][col] = (byte) ((matrix[row][col]) ^ (this.key[row][col]));
 			}
 		}
 	}
-
 
 	private byte[][] readFile (File keyFile) throws Exception {
 
