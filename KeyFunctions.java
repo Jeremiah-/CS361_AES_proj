@@ -55,31 +55,6 @@ public class KeyFunctions {
 					System.out.println("Error: Key has non hex characters.");
 					return null;
 				}
-				
-
-				// int firstHalf = 0;
-				// int secondHalf = 0;
-
-				// if (fileScanner.available() > 1) {
-				// 	firstHalf = fileScanner.read();
-				// 	secondHalf = fileScanner.read();
-				// 	break;
-				// } else if (fileScanner.available() == 1) {
-				// 	firstHalf = fileScanner.read();
-				// } else {
-				// 	break outerLoop;
-				// }
-
-				// if (firstHalf >= '0' && firstHalf <= '9' && secondHalf >= '0' && secondHalf <= '9') {
-
-				// } else if (firstHalf >= 'A' && firstHalf <= 'F' && secondHalf >= 'A' && secondHalf <= 'F') {
-
-				// } else if (firstHalf >= 'a' && firstHalf <= 'f' && secondHalf >= 'a' && secondHalf <= 'f') {
-
-				// } else {
-				// 	// this means there is a non-hex character
-				// 	return null;
-				// }
 
 				// val = (firstHalf << 4) | secondHalf;
 				this.key[row, col] = val;

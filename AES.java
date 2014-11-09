@@ -32,10 +32,10 @@ public class AES{
 		KeyFunctions key = new KeyFunctions(keyFile);
 
 		if (key.isInvalid()) {
-			// System.out.println("Error: Key has non hex characters.");
+			System.out.println("Error: Key has non hex characters.");
 			return;
 		}
-
+		
 
 	}
 }
