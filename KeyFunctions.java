@@ -7,13 +7,13 @@ import java.lang.Integer;
 // TODO: NEED TO TEST BEFORE WE MOVE ON.
 public class KeyFunctions {
 	// for this program, we are assuming the key is a 4x4 array
-	private byte[][] key;
-	private int round;
+	private char[][] key;
+	// private int round;
 
 	public KeyFunctions (File keyFile) {
 		try {
 			this.key = readFile(keyFile);
-			this.round = 1;
+			// this.round = 1;
 
 		} catch (Exception e) {
 			System.out.println("Error in reading the file. File may not exist or filepath may be wrong.");
@@ -22,46 +22,71 @@ public class KeyFunctions {
 	}
 
 
-	public void newRoundKey(boolean isInitial) {
-		byte[][] newKey = new byte[4][4];
+	public void initializeKey() {
+		// char[][] newKey = new char[4][4];
+		int startOfMatrix = 4;
+		for (int round = 1; round < 11; round++) {
+			// this is the RotWord step
+			this.key[0][startOfMatrix] = this.key[1][startOfMatrix - 1];
+			this.key[1][startOfMatrix] = this.key[2][startOfMatrix - 1];
+			this.key[2][startOfMatrix] = this.key[3][startOfMatrix - 1];
+			this.key[3][startOfMatrix] = this.key[0][startOfMatrix - 1];
 
-		// copy over the old values of the old key
-		for (int i = 0; i < 4; i++) {
-			newKey[i] = this.key[i].clone();
+			SBox.subBytes(this.key, startOfMatrix);	
+
+			// System.out.println("After subs.");
+			// for (int row = 0; row < 4; row++) {
+			// 	for (int col = 0; col < 4; col++) {
+			// 		System.out.printf("%h ", newKey[row][col]);
+			// 	}
+			// 	System.out.println();
+			// }
+			// System.out.println();
+
+			// this is the Rcon addition step
+			char rConVal = Rcon.getRconVal(round);
+			this.key[0][startOfMatrix] = (char) (this.key[0][startOfMatrix] ^ rConVal);	
+
+			// the name is misleading but all we're doing is adding the old and new matrices
+			addNewMatrix(startOfMatrix); 
+
+			startOfMatrix += 4;
+			// this.key = newKey;
+
+			// update to next round
+			// round++;
 		}
-
-		// this is the RotWord step
-		byte temp = newKey[4][4];
-		newKey[4][4] = newKey[1][4];
-		newKey[1][4] = temp;
-
-		// this is the Rcon addition step
-		byte rConVal = Rcon.getRconVal(round);
-		newKey[1][4] = (byte) (newKey[1][4] ^ rConVal);
-
-		// now begins the key transformation
-		SBox.subBytes(newKey);
-
-		// the name is misleading but all we're doing is adding the old and new matrices
-		addRoundKey(newKey); 
-
-		this.key = newKey;
-
-		// update to next round
-		this.round++;
 	}
 
-	public void addRoundKey(byte[][] matrix) {
+	private void addNewMatrix(int startOfMatrix) {
+
+		// // this is for the first column
 		for (int row = 0; row < 4; row++) {
-			for (int col = 0; col < 4; col++) {
-				matrix[row][col] = (byte) ((matrix[row][col]) ^ (this.key[row][col]));
+			this.key[row][startOfMatrix] = (char) (this.key[row][startOfMatrix] ^ this.key[row][startOfMatrix - 4]);
+		}
+
+		for (int col = startOfMatrix + 1; col < startOfMatrix + 4; col++) {
+			for (int row = 0; row < 4; row++) {
+				this.key[row][col] = (char) (this.key[row][col - 4] ^ this.key[row][col - 1]);
 			}
 		}
 	}
 
-	private byte[][] readFile (File keyFile) throws Exception {
 
-		byte[][] newKey = new byte[4][4];
+	public void addRoundKey(char[][] matrix, int round) {
+		int startOfKey = 4 * round;
+		for (int row = 0; row < 4; row++) {
+			for (int col = 0; col < 4; col++) {
+				matrix[row][col] = (char) ((matrix[row][col]) ^ (this.key[row][startOfKey]));
+				startOfKey++;
+			}
+			startOfKey = 4 * round;
+		}
+	}
+
+	private char[][] readFile (File keyFile) throws Exception {
+
+		char[][] newKey = new char[4][4 * 11];
 
 		Scanner fileScanner;
 
@@ -83,14 +108,14 @@ public class KeyFunctions {
 		int end = 2;
 
 		
-		outerLoop:
 		for (int row = 0; row < 4; row++) {
 			for (int col = 0; col < 4; col++) {
 				// int val = 0;
 				String hexVal = hexLine.substring(begin, end);
-				byte val; 
+				hexVal = "0x" + hexVal;
+				char val; 
 				try {
-					val = (byte) Integer.decode(hexVal).intValue();
+					val = (char) Integer.decode(hexVal).intValue();
 				} catch (Exception e) {
 					System.out.println("Error: Key has non hex characters.");
 					return null;
@@ -104,6 +129,25 @@ public class KeyFunctions {
 
 		return newKey;
 	}
+
+	public void printKey () {
+		int start = 0;
+		int end = 4;
+		for (int i = 0; i < 11; i++) {
+			for(int row = 0; row < 4; row++) {
+	      		for(int col = start; col < start + 4; col++) {
+	         		System.out.printf("%h ", this.key[row][col]);
+	      		}
+
+	      		System.out.println();
+	   		}
+	   		start += 4;
+	   		System.out.println("\n");
+	   	}
+	   	
+	}
+
+
 
 	// TODO: need to test this
 	public boolean isInvalid() {
