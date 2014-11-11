@@ -34,15 +34,6 @@ public class KeyFunctions {
 
 			SBox.subBytes(this.key, startOfMatrix);	
 
-			// System.out.println("After subs.");
-			// for (int row = 0; row < 4; row++) {
-			// 	for (int col = 0; col < 4; col++) {
-			// 		System.out.printf("%h ", newKey[row][col]);
-			// 	}
-			// 	System.out.println();
-			// }
-			// System.out.println();
-
 			// this is the Rcon addition step
 			char rConVal = Rcon.getRconVal(round);
 			this.key[0][startOfMatrix] = (char) (this.key[0][startOfMatrix] ^ rConVal);	
@@ -148,8 +139,6 @@ public class KeyFunctions {
 	}
 
 
-
-	// TODO: need to test this
 	public boolean isInvalid() {
 		if (this.key == null) {
 			return true;

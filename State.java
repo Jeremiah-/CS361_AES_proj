@@ -55,6 +55,7 @@ public class State {
 
 	      	System.out.println();
 	   	}
+	   	System.out.println();
 	   	try {
 	   		this.edWriter.write('\n');
 	   	} catch (Exception e) {

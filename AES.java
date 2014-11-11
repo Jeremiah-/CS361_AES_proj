@@ -23,7 +23,6 @@ public class AES{
 			return;
 		}
 
-		// TODO: is this what they want? Make sure if they want output.
 		if (keyFile.length() < 32) {
 			System.out.println("Key size too small. Needs to be 32 hex characters  (128 bits) in hex format.");
 			return;
@@ -55,6 +54,9 @@ public class AES{
 			return;
 		}
 
+		long startTime = System.nanoTime();
+		int howManyLinesEncrypted = 0;
+
 		if (argument.equalsIgnoreCase("-e")) {
 			State currentState = new State(plainTextName, true);
 
@@ -63,6 +65,7 @@ public class AES{
 				currentState.readLine(readPT.nextLine());
 
 				if (currentState.isValid()) {
+					howManyLinesEncrypted++;
 					char[][] stateArray = currentState.getState();
 					key.addRoundKey(stateArray, 0);
 
@@ -102,6 +105,7 @@ public class AES{
 				currentState.readLine(readPT.nextLine());
 
 				if(currentState.isValid()) {
+					howManyLinesEncrypted++;
 
 					char[][] stateArray = currentState.getState();
 
@@ -130,6 +134,12 @@ public class AES{
 		} else {
 			System.out.println("Ivalid flag or not flag not in proper position.");
 		}
+
+		long endTime = System.nanoTime();
+		double time = (endTime - startTime) / 1000000000.0;
+		double megaBytes = (howManyLinesEncrypted * 16) / 1000000.0;
+		double throughput = megaBytes / time;
+		System.out.printf("\nThroughput: %.3f MB/s\n", throughput);
 
 	}
 
